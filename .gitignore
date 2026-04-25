@@ -1,0 +1,50 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code related
+.vscode/
+
+# Flutter/Dart related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-proxy.json
+.pub/
+build/
+coverage/
+lib/generated_plugin_registrant.dart
+
+# Android related
+**/android/**/generated/
+**/android/app/google-services.json
+**/android/local.properties
+**/android/key.properties
+**/android/app/debug.keystore
+**/android/app/profile.keystore
+**/android/app/release.keystore
+.gradle/
+
+# Python related
+backend/venv/
+backend/__pycache__/
+backend/*.db
+backend/*.pdf
+backend/temp_*.pdf
+hs_err_pid*

@@ -1,0 +1,22 @@
+[
+  {
+    "job_title": "Software Engineer",
+    "required_skills": ["Python", "FastAPI", "PostgreSQL", "Docker", "Git", "REST API", "Unit Testing", "Microservices"]
+  },
+  {
+    "job_title": "Frontend Developer",
+    "required_skills": ["React", "JavaScript", "HTML", "CSS", "TypeScript", "Tailwind", "Redux", "Webpack"]
+  },
+  {
+    "job_title": "Data Scientist",
+    "required_skills": ["Python", "Pandas", "Scikit-learn", "Machine Learning", "Statistics", "SQL", "TensorFlow", "NLP"]
+  },
+  {
+    "job_title": "Mobile Developer",
+    "required_skills": ["Flutter", "Dart", "Firebase", "Android", "iOS", "State Management", "API Integration"]
+  },
+  {
+    "job_title": "Backend Developer",
+    "required_skills": ["Node.js", "Express", "MongoDB", "Redis", "AWS", "Nginx", "Docker"]
+  }
+]
