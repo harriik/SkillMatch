@@ -1,11 +1,11 @@
-# SkillMatch AI 🚀
+# SkillMatch AI 
 ### AI-Powered Skill & Job Matching System
 
 SkillMatch is a full-stack mobile application that uses **NLP (Natural Language Processing)** to analyze resumes and match users with the best job opportunities based on their actual skills.
 
 ---
 
-## 🌟 Key Features
+##  Key Features
 - **Smart Resume Parsing**: Extracts skills, education, and experience from PDF resumes using Python & NLP.
 - **AI Job Matching**: Uses **TF-IDF Vectorization** and **Cosine Similarity** to calculate the match percentage for various job roles.
 - **Real-time ATS Matcher**: Paste a job description and see instantly how well your resume matches the requirements.
@@ -24,7 +24,7 @@ SkillMatch is a full-stack mobile application that uses **NLP (Natural Language 
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Backend Setup (FastAPI)
 ```bash
@@ -46,18 +46,17 @@ flutter run
 
 ---
 
-## 📊 How the Matching Works
+##  How the Matching Works
 The backend converts your resume and job descriptions into mathematical vectors using **TF-IDF**. It then calculates the angle between these vectors using **Cosine Similarity**. 
 - **100% Score**: Perfect overlap of skills.
 - **Skill Gap**: The app identifies exactly which keywords are missing from your resume to help you improve your ATS score.
 
 ---
 
-## 👨‍💻 Project Structure
+##  Project Structure
 - `lib/`: Flutter UI and logic.
 - `backend/`: Python FastAPI server and AI matching scripts.
 - `assets/`: App icons and images.
 
 ---
 
-**Developed for MAD Lab Review** 🎓
