@@ -101,8 +101,68 @@ class AuthService {
       'email': user.email,
       'photo_url': user.photoURL ?? '',
       'resume_url': '',
+      'preferences': {
+        'location': '',
+        'expected_salary': '',
+        'job_type': 'Full-time',
+      },
       'created_at': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+  }
+
+  Future<void> updateDisplayName(String name) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user == null) throw 'User not logged in';
+      await user.updateDisplayName(name);
+      await _firestore.collection('users').doc(user.uid).update({'name': name});
+    } catch (e) {
+      throw 'Failed to update name: $e';
+    }
+  }
+
+  Future<void> updateUserPreferences(Map<String, dynamic> prefs) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user == null) throw 'User not logged in';
+      await _firestore.collection('users').doc(user.uid).update({
+        'preferences': prefs,
+      });
+    } catch (e) {
+      throw 'Failed to update preferences: $e';
+    }
+  }
+
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user == null) throw 'User not logged in';
+      
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw 'Failed to change password: $e';
+    }
+  }
+
+  Future<void> sendPasswordResetEmail() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null && user.email != null) {
+        await _auth.sendPasswordResetEmail(email: user.email!);
+      } else {
+        throw 'Email not found';
+      }
+    } catch (e) {
+      throw 'Failed to send reset email: $e';
+    }
   }
 
   Future<String> updateProfilePhoto(File imageFile) async {

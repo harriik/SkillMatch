@@ -73,16 +73,16 @@ class _JobsScreenState extends State<JobsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.work_off_outlined, size: 64, color: Colors.white24),
+          Icon(Icons.work_off_outlined, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.1)),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             "No recommended jobs yet.",
-            style: TextStyle(color: Colors.white60, fontSize: 16),
+            style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6), fontSize: 16),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             "Upload your resume to see matches.",
-            style: TextStyle(color: Colors.white38, fontSize: 14),
+            style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.4), fontSize: 14),
           ),
         ],
       ),

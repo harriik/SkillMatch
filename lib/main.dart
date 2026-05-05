@@ -8,6 +8,9 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/resume_upload_screen.dart';
 
+// Global notifier for theme management
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -25,10 +28,17 @@ class SkillMatch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      home: const AuthLandingPage(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (_, ThemeMode currentMode, __) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: currentMode,
+          home: const AuthLandingPage(),
+        );
+      },
     );
   }
 }
@@ -53,7 +63,6 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
         final user = snapshot.data;
         if (user != null) {
           return FutureBuilder<DocumentSnapshot>(
-            // We use the UID to fetch the user doc
             future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
@@ -69,7 +78,6 @@ class _AuthLandingPageState extends State<AuthLandingPage> {
                 }
               }
               
-              // If no resume or document doesn't exist yet, go to upload
               return const ResumeUploadScreen();
             },
           );

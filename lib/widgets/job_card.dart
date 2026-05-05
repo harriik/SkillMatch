@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class JobCard extends StatelessWidget {
   final String role;
@@ -15,6 +16,15 @@ class JobCard extends StatelessWidget {
     this.location,
     this.salary,
   });
+
+  Future<void> _launchApplyUrl() async {
+    final String query = Uri.encodeComponent("$role jobs ${company ?? ''}");
+    final Uri url = Uri.parse("https://www.google.com/search?q=$query");
+    
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +67,7 @@ class JobCard extends StatelessWidget {
                       Text(
                         "${company ?? 'Unknown Co.'} • ${location ?? 'Remote'}",
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white60,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -75,7 +85,7 @@ class JobCard extends StatelessWidget {
                   child: Text(
                     match,
                     style: const TextStyle(
-                      color: Colors.greenAccent,
+                      color: Colors.green,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -84,7 +94,7 @@ class JobCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            const Divider(height: 1, color: Colors.white10),
+            Divider(height: 1, color: theme.dividerColor),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -97,7 +107,7 @@ class JobCard extends StatelessWidget {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _launchApplyUrl,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(100, 36),
                     padding: const EdgeInsets.symmetric(horizontal: 16),

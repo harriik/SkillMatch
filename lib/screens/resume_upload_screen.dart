@@ -20,8 +20,7 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
   bool _isUploading = false;
   File? _selectedFile;
 
-  // UPDATED: Using your actual Wi-Fi IPv4 address from ipconfig
-  final String backendUrl = "http://10.224.64.23:8000/analyze_resume";
+  final String backendUrl = "http://172.28.254.23:8000/analyze_resume";
 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -43,11 +42,13 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
 
     try {
       // 1. Upload to Supabase Storage
+      print("Step 1: Uploading to Supabase...");
       String resumeUrl = await _authService.uploadResume(_selectedFile!);
       
       // 2. Call FastAPI Backend for AI Analysis
       final user = _authService.currentUser;
       if (user != null) {
+        print("Step 2: Sending to Backend: $backendUrl");
         final response = await http.post(
           Uri.parse(backendUrl),
           headers: {"Content-Type": "application/json"},
@@ -55,33 +56,33 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
             "user_id": user.uid,
             "resume_url": resumeUrl,
           }),
-        ).timeout(const Duration(seconds: 30));
+        ).timeout(const Duration(seconds: 60)); // Increased timeout to 60s
 
         if (response.statusCode != 200) {
-          throw "Backend Error: ${response.statusCode}\n${response.body}";
+          throw "Backend Analysis Failed: ${response.body}";
         }
+        print("Step 3: Analysis Complete!");
       }
 
       if (mounted) {
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context, true);
-        } else {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-            (route) => false,
-          );
-        }
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
       }
     } catch (e) {
+      print("UPLOAD ERROR: $e");
       String msg = e.toString();
       if (e is SocketException) {
-        msg = "Connection Failed: Ensure your PC and phone are on the SAME Wi-Fi (10.36.15.x) and Port 8000 is open in your firewall.";
+        msg = "Network Error: Phone cannot reach the laptop at 172.28.254.23. Ensure both are on the SAME Wi-Fi and Port 8000 is open in your Firewall.";
+      } else if (msg.contains("TimeoutException")) {
+        msg = "Connection Timed Out: Laptop at 172.28.254.23 didn't respond. Check Firewall.";
       }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), duration: const Duration(seconds: 5)),
+          SnackBar(content: Text(msg), duration: const Duration(seconds: 7)),
         );
       }
     } finally {
@@ -123,7 +124,12 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.auto_awesome_rounded, size: 80, color: theme.colorScheme.primary),
+              Image.asset(
+                'assets/icon/logo.png',
+                height: 100,
+                errorBuilder: (context, error, stackTrace) => 
+                  Icon(Icons.auto_awesome_rounded, size: 80, color: theme.colorScheme.primary),
+              ),
               const SizedBox(height: 32),
               const Text(
                 "AI Resume Analysis",

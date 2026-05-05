@@ -27,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text.trim(),
       );
       if (user != null && mounted) {
-        // Check if user has uploaded a resume
         final userData = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
         final hasResume = userData.exists && (userData.data()?['resume_url'] ?? '').isNotEmpty;
 
@@ -100,7 +99,10 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
               Text("Welcome Back", style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text("Log in to your account to find your dream job", style: TextStyle(color: Colors.white60)),
+              Text(
+                "Log in to your account to find your dream job", 
+                style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6))
+              ),
               const SizedBox(height: 48),
               TextField(
                 controller: _emailController,
@@ -115,19 +117,25 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _isLoading ? null : _login,
-                child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text("Login"),
+                child: _isLoading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("Login"),
               ),
               const SizedBox(height: 20),
               OutlinedButton(
-                style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 56)),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 56),
+                  side: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.1)),
+                ),
                 onPressed: _isLoading ? null : _loginWithGoogle,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.login, size: 24),
+                    Icon(Icons.login, size: 24, color: theme.colorScheme.onSurface),
                     const SizedBox(width: 12),
-                    const Text("Sign in with Google", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text(
+                      "Sign in with Google", 
+                      style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold)
+                    ),
                   ],
                 ),
               ),
@@ -135,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account?"),
+                  Text("Don't have an account?", style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7))),
                   TextButton(
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
                     child: Text("Sign Up", style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
