@@ -20,7 +20,9 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
   bool _isUploading = false;
   File? _selectedFile;
 
-  final String backendUrl = "http://172.28.254.23:8000/analyze_resume";
+  // IMPORTANT: Replace this with your public server URL (e.g. from Render or Ngrok)
+  // Local IPs like 172.28.x.x ONLY work on the same Wi-Fi.
+  final String backendUrl = "https://skillmatch-backend-q27s.onrender.com/analyze_resume";
 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -42,13 +44,11 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
 
     try {
       // 1. Upload to Supabase Storage
-      print("Step 1: Uploading to Supabase...");
       String resumeUrl = await _authService.uploadResume(_selectedFile!);
       
       // 2. Call FastAPI Backend for AI Analysis
       final user = _authService.currentUser;
       if (user != null) {
-        print("Step 2: Sending to Backend: $backendUrl");
         final response = await http.post(
           Uri.parse(backendUrl),
           headers: {"Content-Type": "application/json"},
@@ -56,12 +56,11 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
             "user_id": user.uid,
             "resume_url": resumeUrl,
           }),
-        ).timeout(const Duration(seconds: 60)); // Increased timeout to 60s
+        ).timeout(const Duration(seconds: 60));
 
         if (response.statusCode != 200) {
           throw "Backend Analysis Failed: ${response.body}";
         }
-        print("Step 3: Analysis Complete!");
       }
 
       if (mounted) {
@@ -72,17 +71,20 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
         );
       }
     } catch (e) {
-      print("UPLOAD ERROR: $e");
-      String msg = e.toString();
-      if (e is SocketException) {
-        msg = "Network Error: Phone cannot reach the laptop at 172.28.254.23. Ensure both are on the SAME Wi-Fi and Port 8000 is open in your Firewall.";
-      } else if (msg.contains("TimeoutException")) {
-        msg = "Connection Timed Out: Laptop at 172.28.254.23 didn't respond. Check Firewall.";
+      String msg = "Upload failed. ";
+      if (e is SocketException || e.toString().contains("Connection refused")) {
+        msg += "Cannot reach the backend server. If you are using a local IP (172.28.x.x), ensure your phone is on the SAME Wi-Fi as your laptop and the firewall is off.";
+      } else {
+        msg += e.toString();
       }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), duration: const Duration(seconds: 7)),
+          SnackBar(
+            content: Text(msg),
+            duration: const Duration(seconds: 10),
+            action: SnackBarAction(label: "Retry", onPressed: _uploadAndAnalyze),
+          ),
         );
       }
     } finally {
@@ -113,8 +115,8 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
           if (!Navigator.canPop(context))
             TextButton.icon(
               onPressed: _logout,
-              icon: const Icon(Icons.logout, size: 18, color: Colors.white70),
-              label: const Text("Logout", style: TextStyle(color: Colors.white70)),
+              icon: Icon(Icons.logout, size: 18, color: theme.colorScheme.onSurface.withOpacity(0.7)),
+              label: Text("Logout", style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7))),
             ),
         ],
       ),
@@ -124,22 +126,17 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/icon/logo.png',
-                height: 100,
-                errorBuilder: (context, error, stackTrace) => 
-                  Icon(Icons.auto_awesome_rounded, size: 80, color: theme.colorScheme.primary),
-              ),
+              Icon(Icons.auto_awesome_rounded, size: 80, color: theme.colorScheme.primary),
               const SizedBox(height: 32),
               const Text(
                 "AI Resume Analysis",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 "Upload your PDF resume to extract skills and match jobs.",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white60),
+                style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.6)),
               ),
               const SizedBox(height: 48),
               InkWell(
@@ -149,10 +146,10 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
+                    color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _selectedFile != null ? theme.colorScheme.primary : Colors.white10,
+                      color: _selectedFile != null ? theme.colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.1),
                       width: 2,
                     ),
                   ),
@@ -161,12 +158,12 @@ class _ResumeUploadScreenState extends State<ResumeUploadScreen> {
                       Icon(
                         _selectedFile != null ? Icons.check_circle_rounded : Icons.cloud_upload_outlined,
                         size: 40,
-                        color: _selectedFile != null ? Colors.green : Colors.white38,
+                        color: _selectedFile != null ? Colors.green : theme.colorScheme.onSurface.withOpacity(0.3),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         _selectedFile != null ? _selectedFile!.path.split(Platform.pathSeparator).last : "Select Resume (PDF Only)",
-                        style: TextStyle(color: _selectedFile != null ? Colors.white : Colors.white38),
+                        style: TextStyle(color: _selectedFile != null ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withOpacity(0.3)),
                         textAlign: TextAlign.center,
                       ),
                     ],
